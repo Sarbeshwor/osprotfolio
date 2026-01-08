@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { X, Palette, Monitor, Grid3x3, Image } from 'lucide-react';
+import { X, Palette, Monitor, Grid3x3 } from 'lucide-react';
 import { useState } from 'react';
 
 interface PersonalizationSettings {
@@ -25,13 +25,12 @@ export function PersonalizationModal({ currentSettings, onSave, onClose }: Perso
    * Wallpaper presets
    */
   const wallpapers = [
-    { name: 'Background', value: '/src/app/pictures/background.jpg', type: 'image' as const },
-    { name: 'Default', value: 'from-background via-muted/20 to-background', type: 'gradient' as const },
-    { name: 'Ocean', value: 'from-blue-400 via-blue-500 to-blue-600', type: 'gradient' as const },
-    { name: 'Sunset', value: 'from-orange-400 via-red-500 to-pink-600', type: 'gradient' as const },
-    { name: 'Forest', value: 'from-green-400 via-emerald-500 to-teal-600', type: 'gradient' as const },
-    { name: 'Purple Dream', value: 'from-purple-400 via-violet-500 to-indigo-600', type: 'gradient' as const },
-    { name: 'Minimal', value: 'from-gray-100 via-gray-200 to-gray-300', type: 'gradient' as const },
+    { name: 'Default', gradient: 'from-background via-muted/20 to-background' },
+    { name: 'Ocean', gradient: 'from-blue-400 via-blue-500 to-blue-600' },
+    { name: 'Sunset', gradient: 'from-orange-400 via-red-500 to-pink-600' },
+    { name: 'Forest', gradient: 'from-green-400 via-emerald-500 to-teal-600' },
+    { name: 'Purple Dream', gradient: 'from-purple-400 via-violet-500 to-indigo-600' },
+    { name: 'Minimal', gradient: 'from-gray-100 via-gray-200 to-gray-300' },
   ];
 
   /**
@@ -54,58 +53,48 @@ export function PersonalizationModal({ currentSettings, onSave, onClose }: Perso
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-card dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg overflow-hidden"
+        className="bg-card dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Title Bar */}
-        <div className="h-10 bg-gradient-to-r from-primary/5 to-secondary/5 border-b border-border flex items-center justify-between px-3">
+        <div className="h-12 bg-gradient-to-r from-primary/5 to-secondary/5 border-b border-border flex items-center justify-between px-4">
           <div className="flex items-center gap-2">
-            <Palette className="size-3.5" />
-            <span className="font-medium text-xs">Personalize Desktop</span>
+            <Palette className="size-4" />
+            <span className="font-medium text-sm">Personalize Desktop</span>
           </div>
           
           <button
             onClick={onClose}
-            className="size-7 rounded-lg hover:bg-destructive/10 hover:text-destructive flex items-center justify-center transition-colors"
+            className="size-8 rounded-lg hover:bg-destructive/10 hover:text-destructive flex items-center justify-center transition-colors"
           >
-            <X className="size-3.5" />
+            <X className="size-4" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-4 space-y-4">
+        <div className="p-6 space-y-6">
           {/* Wallpaper Selection */}
           <div>
-            <div className="flex items-center gap-1.5 mb-2">
-              <Monitor className="size-4 text-primary" />
-              <h3 className="font-medium text-sm">Wallpaper</h3>
+            <div className="flex items-center gap-2 mb-3">
+              <Monitor className="size-5 text-primary" />
+              <h3 className="font-medium">Wallpaper</h3>
             </div>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-3 gap-3">
               {wallpapers.map((wallpaper) => (
                 <button
                   key={wallpaper.name}
-                  onClick={() => setSettings({ ...settings, wallpaper: wallpaper.value })}
+                  onClick={() => setSettings({ ...settings, wallpaper: wallpaper.gradient })}
                   className={`aspect-video rounded-lg border-2 transition-all ${
-                    settings.wallpaper === wallpaper.value
+                    settings.wallpaper === wallpaper.gradient
                       ? 'border-primary scale-105 shadow-lg'
                       : 'border-border hover:border-primary/50'
                   }`}
                 >
-                  {wallpaper.type === 'image' ? (
-                    <div className="w-full h-full rounded-md relative overflow-hidden">
-                      <img src={wallpaper.value} alt={wallpaper.name} className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 flex items-center justify-center text-[10px] text-white font-medium bg-black/30">
-                        <Image className="size-3 mr-0.5" />
-                        {wallpaper.name}
-                      </div>
+                  <div className={`w-full h-full rounded-md bg-gradient-to-br ${wallpaper.gradient}`}>
+                    <div className="w-full h-full flex items-center justify-center text-xs text-white font-medium bg-black/20">
+                      {wallpaper.name}
                     </div>
-                  ) : (
-                    <div className={`w-full h-full rounded-md bg-gradient-to-br ${wallpaper.value}`}>
-                      <div className="w-full h-full flex items-center justify-center text-[10px] text-white font-medium bg-black/20">
-                        {wallpaper.name}
-                      </div>
-                    </div>
-                  )}
+                  </div>
                 </button>
               ))}
             </div>
@@ -113,54 +102,54 @@ export function PersonalizationModal({ currentSettings, onSave, onClose }: Perso
 
           {/* Theme Selection */}
           <div>
-            <div className="flex items-center gap-1.5 mb-2">
-              <Palette className="size-4 text-primary" />
-              <h3 className="font-medium text-sm">Theme</h3>
+            <div className="flex items-center gap-2 mb-3">
+              <Palette className="size-5 text-primary" />
+              <h3 className="font-medium">Theme</h3>
             </div>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => setSettings({ ...settings, theme: 'light' })}
-                className={`p-3 rounded-lg border-2 transition-all ${
+                className={`p-4 rounded-lg border-2 transition-all ${
                   settings.theme === 'light'
                     ? 'border-primary bg-primary/5'
                     : 'border-border hover:border-primary/50'
                 }`}
               >
-                <div className="text-xs font-medium">Light</div>
-                <div className="text-[10px] text-muted-foreground mt-0.5">Bright and clean</div>
+                <div className="text-sm font-medium">Light</div>
+                <div className="text-xs text-muted-foreground mt-1">Bright and clean</div>
               </button>
               <button
                 onClick={() => setSettings({ ...settings, theme: 'dark' })}
-                className={`p-3 rounded-lg border-2 transition-all ${
+                className={`p-4 rounded-lg border-2 transition-all ${
                   settings.theme === 'dark'
                     ? 'border-primary bg-primary/5'
                     : 'border-border hover:border-primary/50'
                 }`}
               >
-                <div className="text-xs font-medium">Dark</div>
-                <div className="text-[10px] text-muted-foreground mt-0.5">Easy on the eyes</div>
+                <div className="text-sm font-medium">Dark</div>
+                <div className="text-xs text-muted-foreground mt-1">Easy on the eyes</div>
               </button>
             </div>
           </div>
 
           {/* Icon Size */}
           <div>
-            <div className="flex items-center gap-1.5 mb-2">
-              <Grid3x3 className="size-4 text-primary" />
-              <h3 className="font-medium text-sm">Icon Size</h3>
+            <div className="flex items-center gap-2 mb-3">
+              <Grid3x3 className="size-5 text-primary" />
+              <h3 className="font-medium">Icon Size</h3>
             </div>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-3 gap-3">
               {(['large', 'medium', 'small'] as const).map((size) => (
                 <button
                   key={size}
                   onClick={() => setSettings({ ...settings, iconSize: size })}
-                  className={`p-3 rounded-lg border-2 transition-all ${
+                  className={`p-4 rounded-lg border-2 transition-all ${
                     settings.iconSize === size
                       ? 'border-primary bg-primary/5'
                       : 'border-border hover:border-primary/50'
                   }`}
                 >
-                  <div className="text-xs font-medium capitalize">{size}</div>
+                  <div className="text-sm font-medium capitalize">{size}</div>
                 </button>
               ))}
             </div>
@@ -168,16 +157,16 @@ export function PersonalizationModal({ currentSettings, onSave, onClose }: Perso
         </div>
 
         {/* Footer */}
-        <div className="p-3 border-t border-border flex justify-end gap-2">
+        <div className="p-4 border-t border-border flex justify-end gap-2">
           <button
             onClick={onClose}
-            className="px-3 py-1.5 rounded-lg border border-border hover:bg-muted/50 transition-colors text-xs"
+            className="px-4 py-2 rounded-lg border border-border hover:bg-muted/50 transition-colors text-sm"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
-            className="px-3 py-1.5 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-xs"
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm"
           >
             Apply Changes
           </button>

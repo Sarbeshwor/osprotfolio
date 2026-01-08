@@ -93,7 +93,7 @@ export function Desktop() {
   
   // Personalization settings
   const [settings, setSettings] = useState<PersonalizationSettings>({
-    wallpaper: '/src/app/pictures/background.jpg',
+    wallpaper: 'from-background via-muted/20 to-background',
     theme: 'light',
     iconSize: 'large',
   });
@@ -629,23 +629,9 @@ export function Desktop() {
   return (
     <DndProvider backend={HTML5Backend}>
       <div
-        className="flex flex-col h-screen w-screen relative overflow-hidden"
-        style={{
-          ...(settings.wallpaper.startsWith('/') || settings.wallpaper.startsWith('http')
-            ? {
-                backgroundImage: `url(${settings.wallpaper})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat'
-              }
-            : {})
-        }}
+        className={`flex flex-col h-screen w-screen bg-gradient-to-br ${settings.wallpaper} relative overflow-hidden`}
         onContextMenu={handleContextMenu}
       >
-        {/* Gradient overlay if using gradient wallpaper */}
-        {!settings.wallpaper.startsWith('/') && !settings.wallpaper.startsWith('http') && (
-          <div className={`absolute inset-0 bg-gradient-to-br ${settings.wallpaper} -z-10`} />
-        )}
         {/* Desktop Content */}
         <div className="flex-1 relative">
           {/* Default Desktop Icons - Now draggable */}
