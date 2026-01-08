@@ -21,6 +21,7 @@ import { StartMenu } from './StartMenu';
 import { LoginScreen } from './LoginScreen';
 import { BrowserContent } from './BrowserContent';
 import { ChromeIcon } from './ChromeIcon';
+import { Stickyman } from './Stickyman';
 import { motion } from 'motion/react';
 
 interface OpenWindow {
@@ -60,6 +61,7 @@ export function Desktop() {
   const [maxZIndex, setMaxZIndex] = useState(1);
   const [showRecruiter, setShowRecruiter] = useState(false);
   const [isShuttingDown, setIsShuttingDown] = useState(false);
+  const [stickymanInstances, setStickymanInstances] = useState<string[]>([]);
   
   // Icon selection state
   const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
@@ -93,7 +95,7 @@ export function Desktop() {
   
   // Personalization settings
   const [settings, setSettings] = useState<PersonalizationSettings>({
-    wallpaper: 'from-background via-muted/20 to-background',
+    wallpaper: '/src/app/pictures/background.jpg',
     theme: 'light',
     iconSize: 'large',
   });
@@ -478,6 +480,13 @@ export function Desktop() {
   };
 
   const openWindow = (type: string) => {
+    // Special case: Stickyman overlay (not a window)
+    if (type === 'stickyman') {
+      const newId = `stickyman-${Date.now()}`;
+      setStickymanInstances([...stickymanInstances, newId]);
+      return;
+    }
+
     // Check if window is already open
     if (openWindows.find(w => w.id === type)) {
       focusWindow(type);
@@ -629,9 +638,23 @@ export function Desktop() {
   return (
     <DndProvider backend={HTML5Backend}>
       <div
-        className={`flex flex-col h-screen w-screen bg-gradient-to-br ${settings.wallpaper} relative overflow-hidden`}
+        className="flex flex-col h-screen w-screen relative overflow-hidden"
+        style={{
+          ...(settings.wallpaper.startsWith('/') || settings.wallpaper.startsWith('http')
+            ? {
+                backgroundImage: `url(${settings.wallpaper})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat'
+              }
+            : {})
+        }}
         onContextMenu={handleContextMenu}
       >
+        {/* Gradient overlay if using gradient wallpaper */}
+        {!settings.wallpaper.startsWith('/') && !settings.wallpaper.startsWith('http') && (
+          <div className={`absolute inset-0 bg-gradient-to-br ${settings.wallpaper} -z-10`} />
+        )}
         {/* Desktop Content */}
         <div className="flex-1 relative">
           {/* Default Desktop Icons - Now draggable */}
@@ -806,6 +829,16 @@ export function Desktop() {
                 onClose={() => setShowPersonalization(false)}
               />
             )}
+          </AnimatePresence>
+
+          {/* Stickyman Overlay */}
+          <AnimatePresence>
+            {stickymanInstances.map((id) => (
+              <Stickyman 
+                key={id}
+                onClose={() => setStickymanInstances(stickymanInstances.filter(i => i !== id))} 
+              />
+            ))}
           </AnimatePresence>
 
           {/* Recruiter Mode Overlay */}

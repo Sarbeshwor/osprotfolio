@@ -49,6 +49,9 @@ GitHub: github.com/sarbeshwor
 LinkedIn: linkedin.com/in/nogom
 Upwork: upwork.com/freelancers/~010f2b33ffebd2d9d3`,
   },
+  stickyman: {
+    output: `Launching Stickyman...`,
+  },
 };
 
 interface TerminalContentProps {
@@ -95,6 +98,8 @@ export function TerminalContent({ onOpenWindow }: TerminalContentProps) {
         setTimeout(() => onOpenWindow('projects'), 100);
       } else if (cmd === 'resume' && onOpenWindow) {
         setTimeout(() => onOpenWindow('resume'), 100);
+      } else if (cmd === 'stickyman' && onOpenWindow) {
+        setTimeout(() => onOpenWindow('stickyman'), 100);
       }
     } else {
       output = `Command not found: ${cmd}\nType 'help' for available commands.`;
@@ -106,10 +111,10 @@ export function TerminalContent({ onOpenWindow }: TerminalContentProps) {
 
   return (
     <div
-      className="p-6 font-mono text-sm min-h-[400px] bg-[#f6f5f4] text-foreground"
+      className="p-6 font-mono text-sm min-h-[400px] bg-[#1e1e1e] text-[#d4d4d4]"
       onClick={() => inputRef.current?.focus()}
     >
-      <div className="mb-4 text-muted-foreground">
+      <div className="mb-4 text-[#6a9955]">
         <p>OMOS Terminal v1.0</p>
         <p>Type 'help' for available commands.</p>
         <p className="mt-2">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</p>
@@ -122,25 +127,27 @@ export function TerminalContent({ onOpenWindow }: TerminalContentProps) {
           animate={{ opacity: 1, y: 0 }}
           className="mb-4"
         >
-          <div className="flex items-center gap-2 text-primary">
+          <div className="flex items-center gap-2 text-[#4ec9b0]">
             <span>$</span>
             <span>{item.command}</span>
           </div>
-          <pre className="mt-1 whitespace-pre-wrap text-muted-foreground">{item.output}</pre>
+          <pre className="mt-1 whitespace-pre-wrap text-[#d4d4d4]">{item.output}</pre>
         </motion.div>
       ))}
 
       <form onSubmit={handleSubmit} className="flex items-center gap-2">
-        <span className="text-primary">$</span>
-        <input
-          ref={inputRef}
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          className="flex-1 bg-transparent outline-none"
-          autoFocus
-        />
-        <span className={`w-2 h-4 bg-primary ${cursorVisible ? 'opacity-100' : 'opacity-0'}`} />
+        <span className="text-[#4ec9b0]">$</span>
+        <div className="flex-1 flex items-center">
+          <input
+            ref={inputRef}
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            className="flex-1 bg-transparent outline-none text-[#d4d4d4] caret-transparent"
+            autoFocus
+          />
+          <span className={`w-2 h-4 bg-[#4ec9b0] ml-0.5 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`} />
+        </div>
       </form>
 
       <div ref={endRef} />
