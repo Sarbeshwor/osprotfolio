@@ -8,10 +8,10 @@ interface StatusBarProps {
   isStartMenuOpen?: boolean;
 }
 
-export function StatusBar({ 
-  onRecruiterModeToggle, 
+export function StatusBar({
+  onRecruiterModeToggle,
   onStartMenuToggle,
-  isStartMenuOpen = false 
+  isStartMenuOpen = false
 }: StatusBarProps = {}) {
   const [time, setTime] = useState(new Date());
 
@@ -32,17 +32,16 @@ export function StatusBar({
   });
 
   return (
-    <div className="h-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-t border-border flex items-center justify-between px-2 shadow-sm">
+    <div className="h-10 bg-white/80 dark:bg-card/70 backdrop-blur-md border-t border-border flex items-center justify-between px-2 shadow-sm relative z-50">
       {/* Start Button */}
       <motion.button
         onClick={onStartMenuToggle}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className={`flex items-center gap-2 px-4 py-1.5 rounded-lg transition-colors ${
-          isStartMenuOpen
+        className={`flex items-center gap-2 px-4 py-1.5 rounded-lg transition-colors ${isStartMenuOpen
             ? 'bg-primary text-primary-foreground'
             : 'hover:bg-accent'
-        }`}
+          }`}
       >
         <Menu className="size-4" />
         <span className="font-medium text-sm hidden sm:inline">Start</span>
@@ -51,7 +50,7 @@ export function StatusBar({
       <div className="flex items-center gap-4">
         <span className="font-medium text-sm hidden md:inline">OMOS</span>
       </div>
-      
+
       <div className="flex items-center gap-4 text-sm text-muted-foreground">
         <div className="flex items-center gap-2">
           <Wifi className="size-4" />

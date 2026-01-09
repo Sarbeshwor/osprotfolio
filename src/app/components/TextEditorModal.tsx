@@ -46,7 +46,7 @@ export function TextEditorModal({ fileName, initialContent = '', onSave, onClose
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-card dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden"
+        className="bg-card/95 dark:bg-card/85 backdrop-blur-xl rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden border border-white/20 dark:border-white/10"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Title Bar */}
@@ -54,7 +54,7 @@ export function TextEditorModal({ fileName, initialContent = '', onSave, onClose
           <div className="flex items-center gap-2">
             <span className="font-medium text-sm">{fileName}</span>
           </div>
-          
+
           <div className="flex items-center gap-1">
             <button
               onClick={handleSave}

@@ -37,7 +37,7 @@ export function Window({
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if ((e.target as HTMLElement).closest('.window-controls')) return;
-    
+
     setIsDragging(true);
     onFocus();
     dragStartPos.current = {
@@ -71,7 +71,7 @@ export function Window({
       } else if (isResizing) {
         const deltaX = e.clientX - resizeStartPos.current.x;
         const deltaY = e.clientY - resizeStartPos.current.y;
-        
+
         let newWidth = size.width;
         let newHeight = size.height;
         let newX = position.x;
@@ -128,7 +128,7 @@ export function Window({
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ duration: 0.2 }}
-      className="fixed bg-card dark:bg-gray-800 rounded-xl shadow-2xl overflow-hidden"
+      className="fixed bg-card/95 dark:bg-card/80 backdrop-blur-xl rounded-xl shadow-2xl overflow-hidden border border-white/20 dark:border-white/10"
       style={{
         left: position.x,
         top: position.y,
@@ -158,7 +158,7 @@ export function Window({
         className="absolute top-0 bottom-0 right-0 w-1 cursor-e-resize hover:bg-primary/20 transition-colors"
         onMouseDown={(e) => handleResizeMouseDown(e, 'e')}
       />
-      
+
       {/* Corner resize handles */}
       <div
         className="absolute top-0 left-0 w-3 h-3 cursor-nw-resize hover:bg-primary/20 transition-colors"
@@ -186,7 +186,7 @@ export function Window({
           {icon}
           <span className="font-medium text-sm">{title}</span>
         </div>
-        
+
         <div className="window-controls flex items-center gap-1">
           {onMinimize && (
             <button

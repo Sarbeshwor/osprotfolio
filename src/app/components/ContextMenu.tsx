@@ -1,9 +1,9 @@
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  RefreshCw, 
-  FolderPlus, 
-  FileText, 
-  ArrowUpDown, 
+import {
+  RefreshCw,
+  FolderPlus,
+  FileText,
+  ArrowUpDown,
   Palette,
   ChevronRight,
   Calendar,
@@ -155,7 +155,7 @@ export function ContextMenu({
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ duration: 0.1 }}
-        className="fixed z-50 w-56 bg-card dark:bg-gray-800 rounded-lg shadow-2xl border border-border overflow-hidden"
+        className="fixed z-50 w-56 bg-card/95 dark:bg-card/90 backdrop-blur-md rounded-lg shadow-2xl border border-border overflow-hidden"
         style={{ left: adjustedX, top: adjustedY }}
       >
         <div className="py-1">
@@ -188,7 +188,7 @@ export function ContextMenu({
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -10 }}
                       transition={{ duration: 0.1 }}
-                      className="absolute left-full top-0 ml-1 w-48 bg-card dark:bg-gray-800 rounded-lg shadow-2xl border border-border overflow-hidden"
+                      className="absolute left-full top-0 ml-1 w-48 bg-card/95 dark:bg-card/90 backdrop-blur-md rounded-lg shadow-2xl border border-border overflow-hidden"
                     >
                       <div className="py-1">
                         {item.submenuKey === 'sort' &&
@@ -199,9 +199,8 @@ export function ContextMenu({
                                 onSortBy(option.value);
                                 onClose();
                               }}
-                              className={`w-full px-3 py-2 flex items-center gap-3 hover:bg-muted/50 transition-colors text-left text-sm ${
-                                currentSort === option.value ? 'bg-primary/10 text-primary' : ''
-                              }`}
+                              className={`w-full px-3 py-2 flex items-center gap-3 hover:bg-muted/50 transition-colors text-left text-sm ${currentSort === option.value ? 'bg-primary/10 text-primary' : ''
+                                }`}
                             >
                               {option.icon}
                               <span>{option.label}</span>

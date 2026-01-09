@@ -17,12 +17,12 @@ interface DesktopIconProps {
   onSelect?: () => void;
 }
 
-export function DesktopIcon({ 
-  icon: Icon, 
-  label, 
-  onClick, 
-  id, 
-  type = 'app', 
+export function DesktopIcon({
+  icon: Icon,
+  label,
+  onClick,
+  id,
+  type = 'app',
   onDrop,
   onPositionChange,
   onContextMenu,
@@ -72,37 +72,44 @@ export function DesktopIcon({
       y: dragStartPos.current.y + deltaY,
     });
 
-    // Check if hovering over a folder
+    // Check if hovering over a folder, recycle bin, or open folder window
     const elements = document.elementsFromPoint(e.clientX, e.clientY);
-    const folderElement = elements.find(el => 
-      el.classList.contains('desktop-icon') && 
-      el.getAttribute('data-type') === 'folder' &&
-      el.getAttribute('data-id') !== id
+    const targetElement = elements.find(el =>
+      (
+        el.classList.contains('desktop-icon') &&
+        el.getAttribute('data-id') !== id &&
+        (el.getAttribute('data-type') === 'folder' || el.getAttribute('data-id') === 'recycleBin')
+      ) ||
+      (el.classList.contains('folder-window-drop-zone') && el.getAttribute('data-id') !== id)
     );
-    
-    setIsOverFolder(!!folderElement);
+
+    setIsOverFolder(!!targetElement);
   };
 
   const handleMouseUp = (e: MouseEvent) => {
     if (!isDragging) return;
-    
+
     setIsDragging(false);
-    
+
     // Save final position
     if (onPositionChange && id) {
       onPositionChange(id, position.x, position.y);
     }
 
-    // Check if dropped on a folder
+    // Check if dropped on a folder, recycle bin, or open folder window
     const elements = document.elementsFromPoint(e.clientX, e.clientY);
-    const folderElement = elements.find(el => 
-      el.classList.contains('desktop-icon') && 
-      el.getAttribute('data-type') === 'folder'
+    const targetElement = elements.find(el =>
+      (
+        el.classList.contains('desktop-icon') &&
+        el.getAttribute('data-id') !== id &&
+        (el.getAttribute('data-type') === 'folder' || el.getAttribute('data-id') === 'recycleBin')
+      ) ||
+      (el.classList.contains('folder-window-drop-zone') && el.getAttribute('data-id') !== id)
     ) as HTMLElement;
-    
-    if (folderElement && onDrop && id) {
-      const targetId = folderElement.getAttribute('data-id');
-      if (targetId && targetId !== id) {
+
+    if (targetElement && onDrop && id) {
+      const targetId = targetElement.getAttribute('data-id');
+      if (targetId) {
         onDrop(id, targetId);
       }
     }
@@ -124,7 +131,7 @@ export function DesktopIcon({
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    
+
     // Don't trigger click if we were actually dragging
     if (hasMoved) {
       return;
@@ -154,11 +161,8 @@ export function DesktopIcon({
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       whileHover={{ scale: isDragging ? 1 : 1.05 }}
-      className={`desktop-icon absolute flex flex-col items-center gap-1.5 p-3 rounded-xl transition-colors group ${
-        isDragging ? 'opacity-50 z-50' : 'z-0'
-      } ${isOverFolder ? 'ring-2 ring-primary' : ''} ${
-        isSelected ? 'bg-primary/20 dark:bg-primary/30' : 'hover:bg-white/40 dark:hover:bg-white/10'
-      }`}
+      className={`desktop-icon absolute flex flex-col items-center gap-2 p-2 rounded-lg transition-all group ${isDragging ? 'opacity-50 z-50' : 'z-0'
+        } ${isOverFolder ? 'scale-110' : ''}`}
       style={{
         left: `${position.x}px`,
         top: `${position.y}px`,
@@ -174,10 +178,17 @@ export function DesktopIcon({
         }
       }}
     >
-      <div className="size-12 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow pointer-events-none">
-        <Icon className="size-6 text-white" />
+      <div className={`relative size-12 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-300 ${isSelected
+        ? 'bg-primary ring-2 ring-offset-2 ring-primary dark:ring-offset-black'
+        : 'bg-white dark:bg-zinc-900 group-hover:-translate-y-1 group-hover:shadow-xl'
+        }`}>
+        <Icon className={`size-6 transition-colors ${isSelected ? 'text-primary-foreground' : 'text-primary'}`} />
+
+        {/* Selection indicator dot/glow instead of full box */}
+        {isSelected && <div className="absolute inset-0 rounded-2xl bg-primary/20 animate-pulse" />}
       </div>
-      <span className="text-xs font-medium text-black dark:text-black max-w-[70px] truncate pointer-events-none" title={label}>
+      <span className={`text-xs font-medium text-center drop-shadow-md max-w-[80px] truncate px-1.5 py-0.5 rounded-full transition-colors ${isSelected ? 'bg-primary text-primary-foreground' : 'text-foreground'
+        }`} title={label}>
         {label}
       </span>
     </motion.div>

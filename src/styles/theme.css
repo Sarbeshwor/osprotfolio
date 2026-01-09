@@ -42,40 +42,58 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
+  /* Rich Dark Theme (Slate/Gunmetal Base) */
+  --background: oklch(0.11 0.02 258);      /* Deepest slate */
   --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
+  
+  --card: oklch(0.15 0.03 260);            /* Slightly lighter for surface elevation */
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
+  
+  --popover: oklch(0.15 0.03 260);         /* Consistent with card */
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
+  
+  --primary: oklch(0.65 0.18 30);          /* Vibrant orange/red accent preserved (adjusted for dark mode visibility if needed, or keep) - Keeping distinct */
+             /* Actually, let's align primary to be visible. The original was white (oklch(0.985 0 0)). 
+                Let's make it a vibrant accent like the light mode but suitable for dark. 
+                Light mode primary is #e95420. Let's start with a vibrant version. */
+  --primary: oklch(0.65 0.22 25); /* Vibrant Orange matching brand */
+  --primary-foreground: oklch(0.985 0 0);
+  
+  --secondary: oklch(0.20 0.04 265);        /* Muted slate for secondary elements */
   --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
+  
+  --muted: oklch(0.18 0.03 260);
+  --muted-foreground: oklch(0.65 0.05 260); /* Readable grey */
+  
+  --accent: oklch(0.20 0.04 265);          /* Selection/Hover states */
   --accent-foreground: oklch(0.985 0 0);
+  
   --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
+  --destructive-foreground: oklch(0.985 0 0);
+  
+  --border: oklch(0.22 0.04 262);          /* Subtle border separation */
+  --input: oklch(0.20 0.03 260);
+  --ring: oklch(0.65 0.22 25);             /* Match primary */
+  
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
+  
+  /* Chart Colors (Brightened for dark bg) */
+  --chart-1: oklch(0.6 0.2 260);
+  --chart-2: oklch(0.7 0.17 160);
+  --chart-3: oklch(0.8 0.19 70);
+  --chart-4: oklch(0.65 0.25 300);
+  --chart-5: oklch(0.7 0.25 20);
+  
+  /* Sidebar - Darker than card, or semi-translucent vibe */
+  --sidebar: oklch(0.13 0.03 260);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary: oklch(0.65 0.22 25);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent: oklch(0.18 0.03 260);
   --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
+  --sidebar-border: oklch(0.22 0.04 262);
+  --sidebar-ring: oklch(0.65 0.22 25);
 }
 
 @theme inline {

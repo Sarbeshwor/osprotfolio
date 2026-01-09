@@ -18,7 +18,7 @@ export function RecruiterMode({ onClose }: RecruiterModeProps) {
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-auto scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent hover:scrollbar-thumb-primary/40"
+        className="bg-card/95 dark:bg-card/90 backdrop-blur-xl rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-auto border border-white/20 dark:border-white/10 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent hover:scrollbar-thumb-primary/40"
         onClick={(e) => e.stopPropagation()}
         style={{
           scrollbarWidth: 'thin',
@@ -33,7 +33,7 @@ export function RecruiterMode({ onClose }: RecruiterModeProps) {
           >
             <X className="size-5" />
           </button>
-          
+
           <h2 className="text-white mb-1">Quick Recruiter View</h2>
           <p className="text-white/90 text-sm">Everything you need at a glance</p>
         </div>

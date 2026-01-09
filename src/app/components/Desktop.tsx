@@ -21,7 +21,6 @@ import { StartMenu } from './StartMenu';
 import { LoginScreen } from './LoginScreen';
 import { BrowserContent } from './BrowserContent';
 import { ChromeIcon } from './ChromeIcon';
-import { Stickyman } from './Stickyman';
 import { motion } from 'motion/react';
 
 interface OpenWindow {
@@ -55,44 +54,50 @@ export function Desktop() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [username, setUsername] = useState('');
   const [isStartMenuOpen, setIsStartMenuOpen] = useState(false);
-  
+
   const [openWindows, setOpenWindows] = useState<OpenWindow[]>([]);
   const [windowZIndex, setWindowZIndex] = useState<{ [key: string]: number }>({});
   const [maxZIndex, setMaxZIndex] = useState(1);
   const [showRecruiter, setShowRecruiter] = useState(false);
   const [isShuttingDown, setIsShuttingDown] = useState(false);
-  const [stickymanInstances, setStickymanInstances] = useState<string[]>([]);
-  
+
   // Icon selection state
   const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
-  
+
   // Context menu state
-  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; itemId?: string } | null>(null);
-  
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; itemId?: string; parentId?: string | null } | null>(null);
+
   // Desktop items state
   const [desktopItems, setDesktopItems] = useState<DesktopItem[]>([]);
   const [sortBy, setSortBy] = useState<'name' | 'date' | 'type'>('name');
+
+  // Auto-arrange when sort order changes
+  useEffect(() => {
+    handleAutoArrange();
+  }, [sortBy]);
+
   const [viewSize, setViewSize] = useState<'large' | 'medium' | 'small'>('large');
-  
+
   // Default app icon positions
   const [appIconPositions, setAppIconPositions] = useState({
-    browser: { x: 32, y: 32 },
-    terminal: { x: 32, y: 132 },
-    projects: { x: 32, y: 232 },
-    resume: { x: 32, y: 332 },
-    contact: { x: 32, y: 432 },
-    recycleBin: { x: 32, y: 532 },
+    browser: { x: 48, y: 48 },
+    terminal: { x: 48, y: 148 },
+    projects: { x: 48, y: 248 },
+    resume: { x: 48, y: 348 },
+    contact: { x: 48, y: 448 },
+    recycleBin: { x: 48, y: 548 },
   });
-  
+
   // Modals state
   const [editingFile, setEditingFile] = useState<DesktopItem | null>(null);
   const [showPersonalization, setShowPersonalization] = useState(false);
-  const [promptDialog, setPromptDialog] = useState<{ 
-    title: string; 
-    placeholder: string; 
-    type: 'folder' | 'file' 
+  const [promptDialog, setPromptDialog] = useState<{
+    title: string;
+    placeholder: string;
+    type: 'folder' | 'file';
+    parentId?: string | null;
   } | null>(null);
-  
+
   // Personalization settings
   const [settings, setSettings] = useState<PersonalizationSettings>({
     wallpaper: 'from-background via-muted/20 to-background',
@@ -142,7 +147,7 @@ export function Desktop() {
       const items = JSON.parse(saved);
       setDesktopItems(items.map((item: any) => ({ ...item, createdAt: new Date(item.createdAt) })));
     }
-    
+
     // Load app icon positions
     const savedAppPositions = localStorage.getItem('appIconPositions');
     if (savedAppPositions) {
@@ -193,14 +198,26 @@ export function Desktop() {
   /**
    * Handle right-click on desktop background
    */
+  /**
+   * Handle right-click on desktop background
+   */
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
     // Only show context menu if clicking on desktop background
     if ((e.target as HTMLElement).closest('.desktop-icon, .window, .recruiter-button')) {
       return;
     }
-    setContextMenu({ x: e.clientX, y: e.clientY });
+    setContextMenu({ x: e.clientX, y: e.clientY, parentId: null });
     setSelectedIcon(null); // Clear selection when clicking on desktop
+  };
+
+  /**
+   * Handle right-click inside a folder window
+   */
+  const handleFolderContextMenu = (e: React.MouseEvent, folderId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setContextMenu({ x: e.clientX, y: e.clientY, parentId: folderId });
   };
 
   /**
@@ -258,22 +275,27 @@ export function Desktop() {
   /**
    * Create new folder
    */
-  const handleCreateFolder = () => {
-    setPromptDialog({ 
-      title: 'Create New Folder', 
+  /**
+   * Create new folder
+   */
+  const handleCreateFolder = (parentId?: string | null) => {
+    setPromptDialog({
+      title: 'Create New Folder',
       placeholder: 'Enter folder name',
-      type: 'folder'
+      type: 'folder',
+      parentId
     });
   };
 
   /**
    * Create new text file
    */
-  const handleCreateFile = () => {
-    setPromptDialog({ 
-      title: 'Create New Text File', 
+  const handleCreateFile = (parentId?: string | null) => {
+    setPromptDialog({
+      title: 'Create New Text File',
       placeholder: 'Enter file name',
-      type: 'file'
+      type: 'file',
+      parentId
     });
   };
 
@@ -281,14 +303,16 @@ export function Desktop() {
    * Handle prompt dialog confirmation
    */
   const handlePromptConfirm = (name: string) => {
+    const parentId = promptDialog?.parentId || null;
+
     if (promptDialog?.type === 'folder') {
       const newFolder: DesktopItem = {
         id: `folder-${Date.now()}`,
         name,
         type: 'folder',
         createdAt: new Date(),
-        position: getNextAvailablePosition(),
-        parentId: null,
+        position: parentId ? { x: 0, y: 0 } : getNextAvailablePosition(), // Position doesn't matter much inside grid folders
+        parentId,
       };
       setDesktopItems([...desktopItems, newFolder]);
     } else if (promptDialog?.type === 'file') {
@@ -298,8 +322,8 @@ export function Desktop() {
         type: 'file',
         content: '',
         createdAt: new Date(),
-        position: getNextAvailablePosition(),
-        parentId: null,
+        position: parentId ? { x: 0, y: 0 } : getNextAvailablePosition(),
+        parentId,
       };
       setDesktopItems([...desktopItems, newFile]);
       setEditingFile(newFile);
@@ -313,7 +337,7 @@ export function Desktop() {
   const getNextAvailablePosition = () => {
     const gridSize = 100; // Icon width + spacing (reduced)
     const startX = 300; // Start well after default icons on the left
-    const startY = 32; // Top margin
+    const startY = 48; // Top margin
     const maxColumns = Math.floor((window.innerWidth - 350) / gridSize);
 
     const rootItems = getRootItems();
@@ -329,44 +353,113 @@ export function Desktop() {
   /**
    * Auto arrange all icons in grid
    */
+  /**
+   * Auto arrange all icons in grid
+   */
   const handleAutoArrange = () => {
     const gridSize = 100;
-    const startX = 300; // Start well after default icons
-    const startY = 32; // Same top margin as default icons
-    const maxColumns = Math.floor((window.innerWidth - 350) / gridSize);
+    const startX = 48; // Align with default left margin
+    const startY = 48; // Top margin
+    const maxRows = Math.floor((window.innerHeight - 100) / gridSize);
+    const maxColumns = Math.floor((window.innerWidth - 32) / gridSize); // Use full width
 
+    // Track occupied positions (row, col)
+    const occupied = new Set<string>();
+
+    // Helper to get next free slot
+    const getNextFreeSlot = () => {
+      for (let col = 0; col < maxColumns; col++) {
+        for (let row = 0; row < maxRows; row++) {
+          if (!occupied.has(`${row},${col}`)) {
+            return { row, col };
+          }
+        }
+      }
+      return { row: 0, col: 0 }; // Fallback
+    };
+
+    // 1. Arrange Default Apps vertically in the first column(s)
+    const appIds = ['browser', 'terminal', 'projects', 'resume', 'contact', 'recycleBin'];
+    const newAppPositions: Record<string, { x: number; y: number }> = {};
+
+    appIds.forEach((id) => {
+      const slot = getNextFreeSlot();
+      occupied.add(`${slot.row},${slot.col}`);
+      newAppPositions[id] = {
+        x: startX + (slot.col * gridSize),
+        y: startY + (slot.row * gridSize),
+      };
+    });
+
+    setAppIconPositions(newAppPositions as any);
+
+    // 2. Arrange Dynamic Desktop Items
     const sortedItems = getSortedItems();
-    const rearrangedItems = sortedItems.map((item, index) => {
-      const row = Math.floor(index / maxColumns);
-      const col = index % maxColumns;
-      
+    const rearrangedItems = sortedItems.map((item) => {
+      const slot = getNextFreeSlot();
+      occupied.add(`${slot.row},${slot.col}`);
       return {
         ...item,
         position: {
-          x: startX + (col * gridSize),
-          y: startY + (row * gridSize),
+          x: startX + (slot.col * gridSize),
+          y: startY + (slot.row * gridSize),
         },
       };
     });
 
     setDesktopItems([
-      ...desktopItems.filter(item => !rearrangedItems.find(r => r.id === item.id)),
+      ...desktopItems.filter(item => !rearrangedItems.find(r => r.id === item.id)), // Keep non-root items (if any logic kept them out)
       ...rearrangedItems,
     ]);
   };
 
   /**
-   * Handle icon position change
+   * Handle icon position change with collision detection
    */
-  const handleIconPositionChange = (id: string, x: number, y: number) => {
-    // Check if it's an app icon
-    if (id === 'terminal' || id === 'projects' || id === 'resume' || id === 'contact' || id === 'recycleBin') {
+  /**
+   * Handle icon position change with strict grid snapping
+   */
+  const handleIconPositionChange = (id: string, rawX: number, rawY: number) => {
+    // Grid settings
+    const gridSize = 100;
+    const marginX = 48; // Increased for better centering
+    const marginY = 48;
+
+    // Snap to grid
+    const col = Math.round((rawX - marginX) / gridSize);
+    const row = Math.round((rawY - marginY) / gridSize);
+
+    // Ensure properly bounded
+    const x = Math.max(marginX, marginX + (col * gridSize));
+    const y = Math.max(marginY, marginY + (row * gridSize));
+
+    // Collision Helper
+    const isOccupied = (p: { x: number, y: number }) => {
+      // Tolerance for float/small differences
+      return Math.abs(p.x - x) < 10 && Math.abs(p.y - y) < 10;
+    };
+
+    // Check collisions with Apps
+    const appCollision = Object.entries(appIconPositions).find(([appId, pos]) =>
+      appId !== id && isOccupied(pos)
+    );
+
+    if (appCollision) return; // Snap back
+
+    // Check collisions with Desktop Items
+    const itemCollision = desktopItems.find(item =>
+      item.id !== id && !item.parentId && !item.isDeleted && isOccupied(item.position)
+    );
+
+    if (itemCollision) return; // Snap back
+
+    // No collision - Update state with SNAPPED coordinates
+    if (id === 'terminal' || id === 'projects' || id === 'resume' || id === 'contact' || id === 'recycleBin' || id === 'browser') {
       setAppIconPositions({
         ...appIconPositions,
         [id]: { x, y },
       });
     } else {
-      // It's a desktop item
       setDesktopItems(
         desktopItems.map((item) =>
           item.id === id ? { ...item, position: { x, y } } : item
@@ -374,6 +467,9 @@ export function Desktop() {
       );
     }
   };
+
+
+
 
   /**
    * Save file content
@@ -417,6 +513,7 @@ export function Desktop() {
       icon: <Folder className="size-4" />,
       component: (
         <FolderWindow
+          folderId={folder.id}
           folderName={folder.name}
           items={folderItems}
           onClose={() => closeWindow(folder.id)}
@@ -424,6 +521,7 @@ export function Desktop() {
             const item = desktopItems.find(i => i.id === itemId);
             if (item) handleOpenFile(item);
           }}
+          onContextMenu={handleFolderContextMenu}
         />
       ),
       position: {
@@ -438,12 +536,23 @@ export function Desktop() {
   };
 
   /**
-   * Handle drag and drop - move item into folder
+   * Handle drag and drop - move item into folder or recycle bin
    */
-  const handleDropIntoFolder = (draggedId: string, targetFolderId: string) => {
+  const handleDropIntoFolder = (draggedId: string, targetId: string) => {
+    // Check for Recycle Bin
+    if (targetId === 'recycleBin') {
+      // Don't delete system apps
+      if (draggedId === 'browser' || draggedId === 'terminal' || draggedId === 'projects' || draggedId === 'resume' || draggedId === 'contact') {
+        return;
+      }
+      handleDeleteItem(draggedId);
+      return;
+    }
+
+    // Move to folder
     setDesktopItems(
       desktopItems.map((item) =>
-        item.id === draggedId ? { ...item, parentId: targetFolderId } : item
+        item.id === draggedId ? { ...item, parentId: targetId } : item
       )
     );
   };
@@ -480,13 +589,6 @@ export function Desktop() {
   };
 
   const openWindow = (type: string) => {
-    // Special case: Stickyman overlay (not a window)
-    if (type === 'stickyman') {
-      const newId = `stickyman-${Date.now()}`;
-      setStickymanInstances([...stickymanInstances, newId]);
-      return;
-    }
-
     // Check if window is already open
     if (openWindows.find(w => w.id === type)) {
       focusWindow(type);
@@ -638,23 +740,9 @@ export function Desktop() {
   return (
     <DndProvider backend={HTML5Backend}>
       <div
-        className="flex flex-col h-screen w-screen relative overflow-hidden"
-        style={{
-          ...(settings.wallpaper.startsWith('/') || settings.wallpaper.startsWith('http')
-            ? {
-                backgroundImage: `url(${settings.wallpaper})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat'
-              }
-            : {})
-        }}
+        className={`flex flex-col h-screen w-screen bg-gradient-to-br ${settings.wallpaper} relative overflow-hidden`}
         onContextMenu={handleContextMenu}
       >
-        {/* Gradient overlay if using gradient wallpaper */}
-        {!settings.wallpaper.startsWith('/') && !settings.wallpaper.startsWith('http') && (
-          <div className={`absolute inset-0 bg-gradient-to-br ${settings.wallpaper} -z-10`} />
-        )}
         {/* Desktop Content */}
         <div className="flex-1 relative">
           {/* Default Desktop Icons - Now draggable */}
@@ -764,7 +852,37 @@ export function Desktop() {
                 zIndex={windowZIndex[window.id] || 1}
                 onFocus={() => focusWindow(window.id)}
               >
-                {window.component}
+                {/* Dynamically render content based on ID to ensure reactivity */}
+                {window.id === 'recycleBin' ? (
+                  <RecycleBinWindow
+                    items={getRecycleBinItems()}
+                    onRestore={handleRestoreItem}
+                    onPermanentDelete={handlePermanentDelete}
+                    onEmptyBin={handleEmptyRecycleBin}
+                  />
+                ) : window.id.startsWith('folder-') ? (
+                  // Re-render folder windows to reflect content changes
+                  (() => {
+                    const folder = desktopItems.find(i => i.id === window.id);
+                    if (!folder) return window.component; // Fallback if folder deleted
+                    const folderItems = desktopItems.filter(item => item.parentId === folder.id);
+                    return (
+                      <FolderWindow
+                        folderId={folder.id}
+                        folderName={folder.name}
+                        items={folderItems}
+                        onClose={() => closeWindow(window.id)}
+                        onOpenItem={(itemId) => {
+                          const item = desktopItems.find(i => i.id === itemId);
+                          if (item) handleOpenFile(item);
+                        }}
+                        onContextMenu={handleFolderContextMenu}
+                      />
+                    );
+                  })()
+                ) : (
+                  window.component
+                )}
               </Window>
             ))}
           </AnimatePresence>
@@ -777,8 +895,8 @@ export function Desktop() {
                 y={contextMenu.y}
                 onClose={() => setContextMenu(null)}
                 onRefresh={handleRefresh}
-                onCreateFolder={handleCreateFolder}
-                onCreateFile={handleCreateFile}
+                onCreateFolder={() => handleCreateFolder(contextMenu.parentId)}
+                onCreateFile={() => handleCreateFile(contextMenu.parentId)}
                 onSortBy={(option) => {
                   setSortBy(option);
                 }}
@@ -831,16 +949,6 @@ export function Desktop() {
             )}
           </AnimatePresence>
 
-          {/* Stickyman Overlay */}
-          <AnimatePresence>
-            {stickymanInstances.map((id) => (
-              <Stickyman 
-                key={id}
-                onClose={() => setStickymanInstances(stickymanInstances.filter(i => i !== id))} 
-              />
-            ))}
-          </AnimatePresence>
-
           {/* Recruiter Mode Overlay */}
           <AnimatePresence>
             {showRecruiter && <RecruiterMode onClose={() => setShowRecruiter(false)} />}
@@ -848,24 +956,24 @@ export function Desktop() {
 
           {/* Welcome message */}
           {openWindows.length === 0 && getRootItems().length === 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="absolute inset-0 flex items-center justify-center pointer-events-none"
-          >
-            <div className="text-center space-y-3">
-              <h1 className="text-4xl">Welcome to OMOS</h1>
-              <p className="text-muted-foreground">
-                Click an icon to explore • Right-click for more options
-              </p>
-            </div>
-          </motion.div>
-        )}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="absolute inset-0 flex items-center justify-center pointer-events-none"
+            >
+              <div className="text-center space-y-3">
+                <h1 className="text-4xl">Welcome to OMOS</h1>
+                <p className="text-muted-foreground">
+                  Click an icon to explore • Right-click for more options
+                </p>
+              </div>
+            </motion.div>
+          )}
         </div>
 
         {/* Status Bar */}
-        <StatusBar 
+        <StatusBar
           onRecruiterModeToggle={() => setShowRecruiter(!showRecruiter)}
           onStartMenuToggle={() => setIsStartMenuOpen(!isStartMenuOpen)}
           isStartMenuOpen={isStartMenuOpen}
@@ -896,11 +1004,11 @@ export function Desktop() {
             >
               <motion.div
                 initial={{ scale: 1, opacity: 1 }}
-                animate={{ 
+                animate={{
                   scale: [1, 1.2, 0],
                   opacity: [1, 1, 0]
                 }}
-                transition={{ 
+                transition={{
                   duration: 2.5,
                   times: [0, 0.5, 1],
                   ease: "easeInOut"

@@ -16,18 +16,18 @@ interface RecycleBinWindowProps {
   onEmptyBin: () => void;
 }
 
-export function RecycleBinWindow({ 
-  items, 
-  onRestore, 
+export function RecycleBinWindow({
+  items,
+  onRestore,
   onPermanentDelete,
-  onEmptyBin 
+  onEmptyBin
 }: RecycleBinWindowProps) {
   const [showConfirmEmpty, setShowConfirmEmpty] = useState(false);
 
   const handleEmptyBinClick = () => {
     if (items.length > 0) {
       setShowConfirmEmpty(true);
-    }handleEmptyBinClick
+    }
   };
 
   const confirmEmptyBin = () => {
@@ -40,7 +40,7 @@ export function RecycleBinWindow({
       {/* Toolbar */}
       <div className="flex items-center gap-2 px-4 py-2 border-b border-border bg-muted/30">
         <button
-          onClick={onEmptyBin}
+          onClick={handleEmptyBinClick}
           disabled={items.length === 0}
           className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-md hover:bg-destructive/10 hover:text-destructive transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
@@ -135,7 +135,7 @@ export function RecycleBinWindow({
               <div className="flex-1">
                 <h3 className="text-lg font-semibold mb-2">Empty Recycle Bin?</h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Are you sure you want to permanently delete {items.length} {items.length === 1 ? 'item' : 'items'}? 
+                  Are you sure you want to permanently delete {items.length} {items.length === 1 ? 'item' : 'items'}?
                   This action cannot be undone.
                 </p>
                 <div className="flex gap-2 justify-end">

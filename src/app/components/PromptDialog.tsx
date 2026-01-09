@@ -35,7 +35,7 @@ export function PromptDialog({ title, placeholder, onConfirm, onClose }: PromptD
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-card dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md overflow-hidden"
+        className="bg-card/95 dark:bg-card/85 backdrop-blur-xl rounded-xl shadow-2xl w-full max-w-md overflow-hidden border border-white/20 dark:border-white/10"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Title Bar */}

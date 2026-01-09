@@ -49,9 +49,6 @@ GitHub: github.com/sarbeshwor
 LinkedIn: linkedin.com/in/nogom
 Upwork: upwork.com/freelancers/~010f2b33ffebd2d9d3`,
   },
-  stickyman: {
-    output: `Launching Stickyman...`,
-  },
 };
 
 interface TerminalContentProps {
@@ -78,12 +75,12 @@ export function TerminalContent({ onOpenWindow }: TerminalContentProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const cmd = input.trim().toLowerCase();
     if (!cmd) return;
 
     let output = '';
-    
+
     if (cmd === 'clear') {
       setHistory([]);
       setInput('');
@@ -92,14 +89,12 @@ export function TerminalContent({ onOpenWindow }: TerminalContentProps) {
 
     if (cmd in commands) {
       output = commands[cmd as keyof typeof commands].output;
-      
+
       // Trigger window opening for certain commands
       if (cmd === 'projects' && onOpenWindow) {
         setTimeout(() => onOpenWindow('projects'), 100);
       } else if (cmd === 'resume' && onOpenWindow) {
         setTimeout(() => onOpenWindow('resume'), 100);
-      } else if (cmd === 'stickyman' && onOpenWindow) {
-        setTimeout(() => onOpenWindow('stickyman'), 100);
       }
     } else {
       output = `Command not found: ${cmd}\nType 'help' for available commands.`;
@@ -111,46 +106,70 @@ export function TerminalContent({ onOpenWindow }: TerminalContentProps) {
 
   return (
     <div
-      className="p-6 font-mono text-sm min-h-[400px] bg-[#1e1e1e] text-[#d4d4d4]"
+      className="h-full p-4 font-mono text-sm bg-[#0c0c0c]/95 text-green-400 overflow-y-auto custom-scrollbar"
       onClick={() => inputRef.current?.focus()}
     >
-      <div className="mb-4 text-[#6a9955]">
-        <p>OMOS Terminal v1.0</p>
-        <p>Type 'help' for available commands.</p>
-        <p className="mt-2">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</p>
+      <div className="mb-4 text-green-500/80">
+        <p className="font-bold">OMOS Terminal [Version 1.0.0]</p>
+        <p>(c) 2024 OMOS Corporation. All rights reserved.</p>
+        <p className="mt-2">Type <span className="text-white font-bold">'help'</span> to view available commands.</p>
+        <p className="mb-2">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</p>
       </div>
 
       {history.map((item, i) => (
         <motion.div
           key={i}
-          initial={{ opacity: 0, y: 5 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-4"
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="mb-2"
         >
-          <div className="flex items-center gap-2 text-[#4ec9b0]">
-            <span>$</span>
-            <span>{item.command}</span>
+          <div className="flex items-center gap-2">
+            <span className="text-blue-400 font-bold">guest@omos</span>
+            <span className="text-white">:</span>
+            <span className="text-blue-300">~</span>
+            <span className="text-white">$</span>
+            <span className="text-gray-100 ml-1">{item.command}</span>
           </div>
-          <pre className="mt-1 whitespace-pre-wrap text-[#d4d4d4]">{item.output}</pre>
+          <pre className="mt-1 pl-4 border-l-2 border-green-500/20 whitespace-pre-wrap text-green-300/90 leading-relaxed font-medium">
+            {item.output}
+          </pre>
         </motion.div>
       ))}
 
-      <form onSubmit={handleSubmit} className="flex items-center gap-2">
-        <span className="text-[#4ec9b0]">$</span>
-        <div className="flex-1 flex items-center">
+      <form onSubmit={handleSubmit} className="flex items-center gap-2 mt-2">
+        <span className="text-blue-400 font-bold flex-shrink-0">guest@omos</span>
+        <span className="text-white flex-shrink-0">:</span>
+        <span className="text-blue-300 flex-shrink-0">~</span>
+        <span className="text-white flex-shrink-0">$</span>
+
+        <div className="relative flex-1 group h-6 cursor-text" onClick={() => inputRef.current?.focus()}>
+          {/* Visible Text & Cursor */}
+          <div className="absolute inset-0 flex items-center pointer-events-none">
+            <span className="whitespace-pre text-white font-medium">{input}</span>
+            <span
+              className={`w-2.5 h-5 bg-gray-200 ml-0.5 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}
+              style={{ display: 'inline-block' }}
+            />
+          </div>
+
+          {/* Invisible Input for typing */}
           <input
             ref={inputRef}
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            className="flex-1 bg-transparent outline-none text-[#d4d4d4] caret-transparent"
+            className="w-full h-full bg-transparent text-transparent caret-transparent outline-none border-none p-0 focus:ring-0 z-10"
             autoFocus
+            autoComplete="off"
+            spellCheck="false"
           />
-          <span className={`w-2 h-4 bg-[#4ec9b0] ml-0.5 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`} />
         </div>
       </form>
 
-      <div ref={endRef} />
+
+
+
+      <div ref={endRef} className="h-4" />
     </div>
   );
 }
