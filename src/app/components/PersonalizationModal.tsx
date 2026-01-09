@@ -25,7 +25,7 @@ export function PersonalizationModal({ currentSettings, onSave, onClose }: Perso
    * Wallpaper presets
    */
   const wallpapers = [
-    { name: 'Background', value: '/src/app/pictures/background.jpg', type: 'image' as const },
+    { name: 'Background', value: new URL('../pictures/background.jpg', import.meta.url).href, type: 'image' as const },
     { name: 'Default', value: 'from-background via-muted/20 to-background', type: 'gradient' as const },
     { name: 'Ocean', value: 'from-blue-400 via-blue-500 to-blue-600', type: 'gradient' as const },
     { name: 'Sunset', value: 'from-orange-400 via-red-500 to-pink-600', type: 'gradient' as const },

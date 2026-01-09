@@ -95,7 +95,7 @@ export function Desktop() {
   
   // Personalization settings
   const [settings, setSettings] = useState<PersonalizationSettings>({
-    wallpaper: '/src/app/pictures/background.jpg',
+    wallpaper: 'from-background via-muted/20 to-background',
     theme: 'light',
     iconSize: 'large',
   });

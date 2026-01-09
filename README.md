@@ -5,6 +5,7 @@ A responsive personal portfolio website styled as an operating system interface.
 ## 🚀 Quick Start
 
 ### Development
+
 ```bash
 npm install
 npm run dev
@@ -13,6 +14,7 @@ npm run dev
 Visit `http://localhost:5173` to view the site in development mode.
 
 ### Production Build
+
 ```bash
 npm run build
 ```
@@ -20,6 +22,7 @@ npm run build
 The built files will be in the `dist/` directory.
 
 ### Preview Production Build
+
 ```bash
 npm run preview
 ```
@@ -31,6 +34,7 @@ npm run preview
 This repository is configured for automatic deployment to GitHub Pages via GitHub Actions.
 
 **Setup:**
+
 1. Go to repository **Settings** → **Pages**
 2. Under **Source**, select **GitHub Actions**
 3. Push to the `main` branch to trigger automatic deployment
@@ -40,6 +44,7 @@ The site will be available at: `https://yourusername.github.io/osprotfolio/`
 ### Manual Deployment
 
 After building, deploy the `dist/` folder to any static hosting service:
+
 - Netlify
 - Vercel
 - Cloudflare Pages
@@ -59,9 +64,9 @@ The `vite.config.ts` has `base: '/osprotfolio/'` configured for GitHub Pages dep
 ```ts
 // vite.config.ts
 export default defineConfig({
-  base: '/osprotfolio/', // ← Adjust this
+  base: "/osprotfolio/", // ← Adjust this
   // ...
-})
+});
 ```
 
 ## 🛠️ Tech Stack
