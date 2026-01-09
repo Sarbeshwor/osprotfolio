@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import {
     Wifi, Bluetooth, Flashlight, Moon,
     Settings, Battery, Signal, Bell, X,
-    ChevronDown
+    ChevronDown, Sun, Minimize2
 } from 'lucide-react';
 
 interface NotificationShadeProps {
@@ -43,12 +43,12 @@ export function NotificationShade({ isOpen, onClose }: NotificationShadeProps) {
     };
 
     const quickToggles = [
-        { key: 'wifi', icon: Wifi, label: 'Wi-Fi' },
+        { key: 'wifi', icon: Wifi, label: 'Internet' },
         { key: 'bluetooth', icon: Bluetooth, label: 'Bluetooth' },
         { key: 'flashlight', icon: Flashlight, label: 'Flashlight' },
-        { key: 'darkMode', icon: Moon, label: 'Dark Mode' },
-        { key: 'mobileData', icon: Signal, label: 'Mobile Data' },
-        { key: 'powerSave', icon: Battery, label: 'Power Save' },
+        { key: 'darkMode', icon: Moon, label: 'Dark Theme' },
+        { key: 'mobileData', icon: Signal, label: 'Data' },
+        { key: 'powerSave', icon: Battery, label: 'Battery' },
     ];
 
     // Mock Notifications
@@ -67,9 +67,14 @@ export function NotificationShade({ isOpen, onClose }: NotificationShadeProps) {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.2 }}
-                        className="fixed inset-0 bg-white z-[9999] cursor-pointer touch-none"
+                        className="fixed inset-0 bg-white z-[9999] cursor-pointer touch-none flex items-center justify-center"
                         onClick={() => toggleSetting('flashlight')}
-                    />
+                    >
+                        <div className="text-black opacity-20 flex flex-col items-center gap-2">
+                            <Flashlight className="size-16" />
+                            <span className="font-bold uppercase tracking-widest">Tap to turn off</span>
+                        </div>
+                    </motion.div>
                 )}
             </AnimatePresence>
             <AnimatePresence>
@@ -80,108 +85,136 @@ export function NotificationShade({ isOpen, onClose }: NotificationShadeProps) {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             onClick={onClose}
-                            className="absolute inset-0 bg-black/20 backdrop-blur-[2px] z-40"
+                            className="absolute inset-0 bg-black/60 backdrop-blur-sm z-40"
                         />
 
                         <motion.div
-                            initial={{ y: '-100%' }}
-                            animate={{ y: 0 }}
-                            exit={{ y: '-100%' }}
-                            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-                            className="absolute inset-x-2 top-2 bottom-4 z-50 bg-white/85 dark:bg-black/85 backdrop-blur-xl rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col border border-white/20 dark:border-white/10 text-foreground"
+                            initial={{ y: '-100%', opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: '-100%', opacity: 0 }}
+                            transition={{ type: 'spring', damping: 24, stiffness: 220, mass: 0.8 }}
+                            className="absolute inset-x-2 top-2 z-50 bg-[#1e1e1e] rounded-[2rem] overflow-hidden shadow-2xl flex flex-col text-white ring-1 ring-white/10 pb-6"
+                            style={{ maxHeight: 'calc(100vh - 4rem)' }}
                         >
-                            {/* Handle/Indicator */}
-                            <div className="h-6 flex items-center justify-center pt-3 pb-1 opacity-50" onClick={onClose}>
-                                <div className="w-12 h-1.5 bg-current rounded-full" />
+                            {/* Top Status Bar Placeholder */}
+                            <div className="h-6 flex justify-center items-center shrink-0 opacity-20" onClick={onClose}>
+                                <div className="w-10 h-1 bg-white rounded-full bg-opacity-50" />
                             </div>
 
-                            {/* Header: Date & Settings */}
-                            <div className="px-8 pb-6 flex justify-between items-end mt-2">
-                                <div className="text-4xl font-light tracking-tight">
-                                    {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
-                                    <span className="text-lg opacity-60 ml-2 font-normal">
-                                        {currentTime.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}
-                                    </span>
-                                </div>
-                                <button className="p-3 bg-black/5 dark:bg-white/10 rounded-full hover:bg-black/10 transition-colors">
-                                    <Settings className="size-5" />
-                                </button>
-                            </div>
-
-                            {/* Quick Settings Grid */}
-                            <div className="px-6 pb-8">
-                                <div className="grid grid-cols-3 gap-4">
-                                    {quickToggles.map((toggle) => {
-                                        const isActive = toggles[toggle.key as keyof typeof toggles];
-                                        return (
-                                            <button
-                                                key={toggle.key}
-                                                onClick={() => toggleSetting(toggle.key as keyof typeof toggles)}
-                                                className={`flex flex-col items-center gap-2 p-3 rounded-[1.5rem] transition-all duration-300 ${isActive ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20' : 'bg-black/5 dark:bg-white/10 hover:bg-black/10'}`}
-                                            >
-                                                <div className={`size-12 rounded-full flex items-center justify-center text-xl transition-transform active:scale-95 ${isActive ? 'scale-110' : ''}`}>
-                                                    <toggle.icon className="size-6" />
-                                                </div>
-                                                <span className="text-xs font-medium tracking-wide opacity-90">{toggle.label}</span>
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-
-                                {/* Brightness Slider */}
-                                <div className="mt-8 px-1 flex items-center gap-4">
-                                    <SunIcon className="size-5 opacity-50" />
-                                    <div className="flex-1 h-10 bg-black/5 dark:bg-white/10 rounded-full relative overflow-hidden group">
-                                        <div
-                                            className="absolute inset-y-0 left-0 bg-current opacity-90 rounded-full transition-all"
-                                            style={{ width: `${brightness}%` }}
-                                        />
-                                        <input
-                                            type="range"
-                                            min="0"
-                                            max="100"
-                                            value={brightness}
-                                            onChange={(e) => setBrightness(parseInt(e.target.value))}
-                                            className="absolute inset-0 w-full opacity-0 cursor-pointer"
-                                        />
+                            {/* Clock Header */}
+                            <div className="px-6 pb-6 pt-2 flex justify-between items-start">
+                                <div>
+                                    <div className="text-xl font-medium tracking-tight opacity-90">
+                                        {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
+                                    </div>
+                                    <div className="text-sm opacity-60">
+                                        {currentTime.toLocaleDateString([], { weekday: 'long', day: 'numeric', month: 'short' })}
                                     </div>
                                 </div>
-                            </div>
-
-                            {/* Notifications Section - Scrollable */}
-                            <div className="flex-1 bg-black/5 dark:bg-white/5 rounded-t-[2.5rem] p-6 overflow-y-auto custom-scrollbar">
-                                <div className="flex items-center justify-between mb-6 px-1">
-                                    <h3 className="text-xs font-bold opacity-60 tracking-widest uppercase">Notifications</h3>
-                                    <button
-                                        className="px-3 py-1 rounded-full bg-black/5 dark:bg-white/5 text-[10px] font-bold uppercase tracking-wide opacity-60 hover:opacity-100 transition-opacity"
-                                    >
-                                        Clear
+                                <div className="flex gap-4">
+                                    <button className="p-2.5 rounded-full bg-white/5 hover:bg-white/10 transition-colors">
+                                        <Settings className="size-5" />
                                     </button>
                                 </div>
+                            </div>
 
-                                <div className="space-y-3">
-                                    {notifications.map((notif, i) => (
-                                        <div key={i} className="bg-white/60 dark:bg-black/40 p-4 rounded-3xl backdrop-blur-sm shadow-sm flex gap-4 active:scale-[0.99] transition-transform">
-                                            <div className={`size-10 rounded-full ${notif.color} flex items-center justify-center text-white font-bold shrink-0 shadow-md`}>
-                                                {notif.app[0]}
+                            {/* Quick Toggles Grid */}
+                            <div className="px-4 grid grid-cols-2 gap-3 mb-6">
+                                {/* First 2 are big pills */}
+                                {quickToggles.slice(0, 2).map((toggle) => {
+                                    const isActive = toggles[toggle.key as keyof typeof toggles];
+                                    return (
+                                        <button
+                                            key={toggle.key}
+                                            onClick={() => toggleSetting(toggle.key as keyof typeof toggles)}
+                                            className={`h-20 rounded-[1.8rem] pl-5 pr-4 flex flex-col justify-center gap-1 transition-all duration-300 ${isActive ? 'bg-[#a8c7fa] text-[#001d35]' : 'bg-[#333333] text-white'}`}
+                                        >
+                                            <div className="flex items-center justify-between w-full">
+                                                <toggle.icon className={`size-6 ${isActive ? 'text-[#001d35]' : 'text-white'}`} />
                                             </div>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex justify-between items-start mb-1">
-                                                    <span className="text-xs font-bold opacity-80">{notif.app}</span>
-                                                    <span className="text-[10px] opacity-40 font-medium">{notif.time}</span>
-                                                </div>
-                                                <h4 className="text-sm font-semibold truncate leading-tight mb-0.5">{notif.title}</h4>
-                                                <p className="text-xs opacity-70 truncate leading-relaxed">{notif.body}</p>
-                                            </div>
+                                            <span className="text-sm font-semibold tracking-wide text-left">{toggle.label}</span>
+                                        </button>
+                                    );
+                                })}
+                                {/* Rest are small circles/pills row? No, keep grid but 4 cols? Or just 2 cols for all. Android has 2 cols usually or 4 small circles.
+                                    Let's do a row of smaller circles for the rest.
+                                */}
+                            </div>
+
+                            <div className="px-4 flex justify-between gap-3 mb-8">
+                                {quickToggles.slice(2).map((toggle) => {
+                                    const isActive = toggles[toggle.key as keyof typeof toggles];
+                                    return (
+                                        <div key={toggle.key} className="flex flex-col items-center gap-2 flex-1">
+                                            <button
+                                                onClick={() => toggleSetting(toggle.key as keyof typeof toggles)}
+                                                className={`size-14 rounded-full flex items-center justify-center transition-all duration-300 ${isActive ? 'bg-[#a8c7fa] text-[#001d35]' : 'bg-[#333333] text-white'}`}
+                                            >
+                                                <toggle.icon className="size-6" />
+                                            </button>
+                                            <span className="text-[10px] font-medium opacity-80 text-center leading-tight truncate w-full">{toggle.label}</span>
                                         </div>
-                                    ))}
+                                    );
+                                })}
+                            </div>
+
+                            {/* Brightness Slider */}
+                            <div className="px-6 mb-6">
+                                <div className="h-12 bg-[#333333] rounded-[1.5rem] flex items-center px-4 gap-4 relative overflow-hidden group">
+                                    <Sun className="size-5 text-white/70 z-10" />
+                                    <div
+                                        className="absolute inset-y-0 left-0 bg-white/20 origin-left transition-transform duration-75 ease-out"
+                                        style={{ width: '100%', transform: `scaleX(${brightness / 100})` }}
+                                    />
+                                    <input
+                                        type="range"
+                                        min="0"
+                                        max="100"
+                                        value={brightness}
+                                        onChange={(e) => setBrightness(parseInt(e.target.value))}
+                                        className="absolute inset-0 w-full opacity-0 cursor-pointer z-20"
+                                    />
+                                    <div className="flex-1" />
                                 </div>
                             </div>
 
-                            {/* Bottom Handle */}
-                            <div className="py-2 flex justify-center opacity-30" onClick={onClose}>
-                                <div className="w-16 h-1 bg-current rounded-full" />
+                            {/* Notifications */}
+                            <div className="flex-1 px-4 overflow-y-auto min-h-0">
+                                {notifications.length > 0 ? (
+                                    <div className="space-y-2">
+                                        {notifications.map((notif, i) => (
+                                            <div key={i} className="bg-[#2b2b2b] p-4 rounded-[1.5rem] flex gap-4 items-start">
+                                                <div className={`size-10 rounded-full ${notif.color} flex items-center justify-center text-white shrink-0`}>
+                                                    {notif.app[0]}
+                                                </div>
+                                                <div className="flex-1 min-w-0 pt-0.5">
+                                                    <div className="flex justify-between items-baseline mb-1">
+                                                        <span className="text-sm font-semibold opacity-90">{notif.title}</span>
+                                                        <span className="text-[10px] opacity-50">{notif.time}</span>
+                                                    </div>
+                                                    <p className="text-xs opacity-70 leading-relaxed truncate">{notif.body}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-8 opacity-40 text-sm">
+                                        No new notifications
+                                    </div>
+                                )}
                             </div>
+
+                            {/* Clear All Button */}
+                            {notifications.length > 0 && (
+                                <div className="px-6 pt-4 flex justify-end">
+                                    <button className="text-xs font-bold uppercase tracking-widest opacity-60 hover:opacity-100 bg-[#333333] px-4 py-2 rounded-full">
+                                        Clear All
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* Bottom Handle area */}
+                            <div className="h-4 w-full" onClick={onClose} />
                         </motion.div>
                     </>
                 )}
@@ -190,18 +223,3 @@ export function NotificationShade({ isOpen, onClose }: NotificationShadeProps) {
     );
 }
 
-function SunIcon({ className }: { className?: string }) {
-    return (
-        <svg className={className} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="4" />
-            <path d="M12 2v2" />
-            <path d="M12 20v2" />
-            <path d="m4.93 4.93 1.41 1.41" />
-            <path d="m17.66 17.66 1.41 1.41" />
-            <path d="M2 12h2" />
-            <path d="M20 12h2" />
-            <path d="m6.34 17.66-1.41 1.41" />
-            <path d="m19.07 4.93-1.41 1.41" />
-        </svg>
-    );
-}

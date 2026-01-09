@@ -141,42 +141,6 @@ export function Window({
       }}
       onClick={onFocus}
     >
-      {/* Resize handles */}
-      <div
-        className="absolute top-0 left-0 right-0 h-1 cursor-n-resize hover:bg-primary/20 transition-colors"
-        onMouseDown={(e) => handleResizeMouseDown(e, 'n')}
-      />
-      <div
-        className="absolute bottom-0 left-0 right-0 h-1 cursor-s-resize hover:bg-primary/20 transition-colors"
-        onMouseDown={(e) => handleResizeMouseDown(e, 's')}
-      />
-      <div
-        className="absolute top-0 bottom-0 left-0 w-1 cursor-w-resize hover:bg-primary/20 transition-colors"
-        onMouseDown={(e) => handleResizeMouseDown(e, 'w')}
-      />
-      <div
-        className="absolute top-0 bottom-0 right-0 w-1 cursor-e-resize hover:bg-primary/20 transition-colors"
-        onMouseDown={(e) => handleResizeMouseDown(e, 'e')}
-      />
-
-      {/* Corner resize handles */}
-      <div
-        className="absolute top-0 left-0 w-3 h-3 cursor-nw-resize hover:bg-primary/20 transition-colors"
-        onMouseDown={(e) => handleResizeMouseDown(e, 'nw')}
-      />
-      <div
-        className="absolute top-0 right-0 w-3 h-3 cursor-ne-resize hover:bg-primary/20 transition-colors"
-        onMouseDown={(e) => handleResizeMouseDown(e, 'ne')}
-      />
-      <div
-        className="absolute bottom-0 left-0 w-3 h-3 cursor-sw-resize hover:bg-primary/20 transition-colors"
-        onMouseDown={(e) => handleResizeMouseDown(e, 'sw')}
-      />
-      <div
-        className="absolute bottom-0 right-0 w-3 h-3 cursor-se-resize hover:bg-primary/20 transition-colors"
-        onMouseDown={(e) => handleResizeMouseDown(e, 'se')}
-      />
-
       {/* Title Bar */}
       <div
         className="h-12 bg-gradient-to-r from-primary/5 to-secondary/5 border-b border-border flex items-center justify-between px-4 cursor-grab active:cursor-grabbing"
@@ -206,9 +170,49 @@ export function Window({
       </div>
 
       {/* Content */}
-      <div className="overflow-auto" style={{ height: 'calc(100% - 3rem)' }}>
+      <div className="relative overflow-hidden" style={{ height: 'calc(100% - 3rem)' }}>
         {children}
+        {/* Overlay to prevent iframe capturing mouse events during drag/resize */}
+        {(isDragging || isResizing) && (
+          <div className="absolute inset-0 z-50 bg-transparent" />
+        )}
       </div>
+
+      {/* Resize handles - Placed last to be on top */}
+      <div
+        className="absolute top-0 left-0 right-0 h-1 cursor-n-resize hover:bg-primary/20 transition-colors z-50"
+        onMouseDown={(e) => handleResizeMouseDown(e, 'n')}
+      />
+      <div
+        className="absolute bottom-0 left-0 right-0 h-1 cursor-s-resize hover:bg-primary/20 transition-colors z-50"
+        onMouseDown={(e) => handleResizeMouseDown(e, 's')}
+      />
+      <div
+        className="absolute top-0 bottom-0 left-0 w-1 cursor-w-resize hover:bg-primary/20 transition-colors z-50"
+        onMouseDown={(e) => handleResizeMouseDown(e, 'w')}
+      />
+      <div
+        className="absolute top-0 bottom-0 right-0 w-1 cursor-e-resize hover:bg-primary/20 transition-colors z-50"
+        onMouseDown={(e) => handleResizeMouseDown(e, 'e')}
+      />
+
+      {/* Corner resize handles */}
+      <div
+        className="absolute top-0 left-0 w-3 h-3 cursor-nw-resize hover:bg-primary/20 transition-colors z-50"
+        onMouseDown={(e) => handleResizeMouseDown(e, 'nw')}
+      />
+      <div
+        className="absolute top-0 right-0 w-3 h-3 cursor-ne-resize hover:bg-primary/20 transition-colors z-50"
+        onMouseDown={(e) => handleResizeMouseDown(e, 'ne')}
+      />
+      <div
+        className="absolute bottom-0 left-0 w-3 h-3 cursor-sw-resize hover:bg-primary/20 transition-colors z-50"
+        onMouseDown={(e) => handleResizeMouseDown(e, 'sw')}
+      />
+      <div
+        className="absolute bottom-0 right-0 w-3 h-3 cursor-se-resize hover:bg-primary/20 transition-colors z-50"
+        onMouseDown={(e) => handleResizeMouseDown(e, 'se')}
+      />
     </motion.div>
   );
 }
