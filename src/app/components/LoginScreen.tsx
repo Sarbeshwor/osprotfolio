@@ -41,7 +41,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
             >
               <User className="size-10 text-white" />
             </motion.div>
-            <h1 className="text-3xl font-bold text-white mb-2">OMOS</h1>
+            <h1 className="text-3xl font-bold text-white mb-2">Sarbeshwor Ghimire Portfolio</h1>
             <p className="text-white/80 text-sm">Welcome back! Please sign in to continue.</p>
           </div>
 

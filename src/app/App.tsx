@@ -42,12 +42,12 @@ export default function App() {
             transition={{ duration: 1, ease: "easeInOut" }}
             className="size-24 mx-auto rounded-3xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-2xl"
           >
-            <span className="text-4xl text-white font-bold">H</span>
+            <span className="text-4xl text-white font-bold">SG</span>
           </motion.div>
 
           {/* OS Name */}
           <div>
-            <h1 className="text-3xl mb-2">OMOS</h1>
+            <h1 className="text-3xl mb-2">Sarbeshwor Ghimire</h1>
             <p className="text-muted-foreground">Initializing system...</p>
           </div>
 
