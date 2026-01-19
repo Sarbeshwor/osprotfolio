@@ -170,7 +170,7 @@ export function Window({
       </div>
 
       {/* Content */}
-      <div className="relative overflow-hidden" style={{ height: 'calc(100% - 3rem)' }}>
+      <div className="relative overflow-auto" style={{ height: 'calc(100% - 3rem)' }}>
         {children}
         {/* Overlay to prevent iframe capturing mouse events during drag/resize */}
         {(isDragging || isResizing) && (

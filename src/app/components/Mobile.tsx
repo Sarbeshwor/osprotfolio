@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Terminal, FolderOpen, FileText, Mail, User, Briefcase, Chrome, Trash2, Search, Mic, Camera } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MobileStatusBar } from './MobileStatusBar';
@@ -16,11 +16,45 @@ export function Mobile() {
   const [currentView, setCurrentView] = useState<MobileView>('home');
   const [isShadeOpen, setIsShadeOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
+  const [historyCounter, setHistoryCounter] = useState(0);
+
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      if (isShadeOpen) {
+        setIsShadeOpen(false);
+        // We stay on the current view, but we need to push state back so another back press works
+        window.history.pushState({ view: currentView }, '');
+        return;
+      }
+
+      if (currentView !== 'home') {
+        setCurrentView('home');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [currentView, isShadeOpen]);
+
+  useEffect(() => {
+    // Push initial home state
+    if (window.history.state?.view !== 'home') {
+      window.history.replaceState({ view: 'home' }, '');
+    }
+  }, []);
+
+  const navigateToView = (view: MobileView) => {
+    setCurrentView(view);
+    if (view !== 'home') {
+      window.history.pushState({ view }, '');
+      setHistoryCounter(prev => prev + 1);
+    }
+  };
 
   const renderContent = () => {
     switch (currentView) {
       case 'terminal':
-        return <TerminalContent onOpenWindow={(w) => setCurrentView(w as MobileView)} />;
+        return <TerminalContent onOpenWindow={(w) => navigateToView(w as MobileView)} />;
       case 'projects':
         return <ProjectsContent />;
       case 'resume':
@@ -82,13 +116,15 @@ export function Mobile() {
       return;
     }
     if (currentView !== 'home') {
-      setCurrentView('home');
+      window.history.back();
     }
   };
 
   const handleHome = () => {
     setIsShadeOpen(false);
-    setCurrentView('home');
+    if (currentView !== 'home') {
+      window.history.back();
+    }
     setCurrentPage(0);
   };
 
@@ -153,7 +189,7 @@ export function Mobile() {
 
                 {/* Google Search Bar Widget */}
                 <button
-                  onClick={() => setCurrentView('browser')}
+                  onClick={() => navigateToView('browser')}
                   className="w-full bg-white/90 backdrop-blur-xl rounded-full p-3.5 flex items-center gap-3 shadow-lg mb-10 mx-1 active:scale-95 transition-transform"
                 >
                   <div className="size-6 flex items-center justify-center">
@@ -170,7 +206,7 @@ export function Mobile() {
                   {page1Apps.map((app) => (
                     <button
                       key={app.id}
-                      onClick={() => setCurrentView(app.id === 'skills' ? 'resume' : app.id as MobileView)}
+                      onClick={() => navigateToView(app.id === 'skills' ? 'resume' : app.id as MobileView)}
                       className="flex flex-col items-center gap-1.5 group active:scale-95 transition-transform"
                     >
                       <div className={`size-[3.75rem] rounded-[1.2rem] ${app.color} flex items-center justify-center shadow-lg group-hover:shadow-xl ring-1 ring-black/5 relative overflow-hidden`}>
@@ -192,7 +228,7 @@ export function Mobile() {
                   {page2Apps.map((app) => (
                     <button
                       key={app.id}
-                      onClick={() => setCurrentView(app.id === 'skills' ? 'resume' : app.id as MobileView)}
+                      onClick={() => navigateToView(app.id === 'skills' ? 'resume' : app.id as MobileView)}
                       className="flex flex-col items-center gap-1.5 group active:scale-95 transition-transform"
                     >
                       <div className={`size-[3.75rem] rounded-[1.2rem] ${app.color} flex items-center justify-center shadow-lg group-hover:shadow-xl ring-1 ring-black/5 relative overflow-hidden`}>
@@ -219,7 +255,7 @@ export function Mobile() {
               {apps.slice(0, 4).map(app => (
                 <button
                   key={`dock-${app.id}`}
-                  onClick={() => setCurrentView(app.id as MobileView)}
+                  onClick={() => navigateToView(app.id as MobileView)}
                   className="active:scale-90 transition-transform relative group"
                 >
                   <div className={`size-14 rounded-2xl ${app.color} flex items-center justify-center shadow-xl relative overflow-hidden`}>
@@ -244,7 +280,7 @@ export function Mobile() {
             <div className={`h-8 shrink-0 ${currentView === 'browser' ? 'bg-zinc-100 dark:bg-zinc-900' : 'bg-background'}`} />
 
             {/* Content Container */}
-            <div className="flex-1 w-full overflow-hidden bg-background relative flex flex-col">
+            <div className="flex-1 w-full overflow-auto bg-background relative flex flex-col pb-12">
               {renderContent()}
             </div>
           </motion.div>
