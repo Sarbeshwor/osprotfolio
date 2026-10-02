@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import type { Project } from "@/lib/data";
 import Visual from "./Visuals";
@@ -11,6 +11,14 @@ export default function ProjectItem({ project }: { project: Project }) {
   const { scrollYProgress: p } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const visualY = useTransform(p, [0, 1], ["-7%", "7%"]);
   const numberY = useTransform(p, [0, 1], [40, -40]);
+
+  const images = project.preview ? [project.preview, ...(project.previewAlt ?? [])] : [];
+  const [active, setActive] = useState(0);
+  useEffect(() => {
+    if (images.length < 2) return;
+    const t = setInterval(() => setActive((a) => (a + 1) % images.length), 3500);
+    return () => clearInterval(t);
+  }, [images.length]);
 
   const Wrapper = project.href ? "a" : "div";
   const wrapperProps = project.href
@@ -60,13 +68,18 @@ export default function ProjectItem({ project }: { project: Project }) {
             >
               <div className="h-full w-full scale-100 transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105">
                 {project.preview ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={project.preview}
-                    alt={`${project.title} website preview`}
-                    loading="lazy"
-                    className="h-full w-full object-cover object-top"
-                  />
+                  images.map((src, i) => (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      key={src}
+                      src={src}
+                      alt={`${project.title} preview ${i + 1}`}
+                      loading="lazy"
+                      className={`absolute inset-0 h-full w-full object-cover object-top transition-opacity duration-1000 ${
+                        i === active ? "opacity-100" : "opacity-0"
+                      }`}
+                    />
+                  ))
                 ) : (
                   project.visual && <Visual kind={project.visual} />
                 )}

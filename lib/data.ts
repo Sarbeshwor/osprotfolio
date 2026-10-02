@@ -10,6 +10,8 @@ export type Project = {
   stack: string[];
   visual?: VisualKind;
   preview?: string;
+  // Extra images; when present, preview + these cross-fade in rotation.
+  previewAlt?: string[];
   href?: string;
   note?: string;
 };
@@ -31,6 +33,7 @@ export const projects: Project[] = [
       "A physical machine capable of reproducing handwriting through robotic motion and G-code.",
     stack: ["ATmega32", "ESP32", "CNC", "G-code"],
     preview: "/projects/cnc.jpg",
+    previewAlt: ["/projects/cnc-me.jpg"],
   },
   {
     index: "03",
@@ -75,9 +78,9 @@ export const capabilities = [
   { title: "Hardware", items: "Robotics · embedded systems · CNC" },
 ];
 
-// TODO: replace the email and LinkedIn placeholders before publishing.
+// TODO: replace the LinkedIn placeholder before publishing.
 export const links = {
-  email: "hello@example.com",
+  email: "gsarbeshwor@gmail.com",
   github: "https://github.com/Sarbeshwor",
   linkedin: "https://www.linkedin.com/in/your-handle",
 };
