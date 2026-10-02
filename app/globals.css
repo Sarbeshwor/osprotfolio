@@ -33,10 +33,6 @@ body {
   outline-offset: 4px;
 }
 
-html.has-cursor,
-html.has-cursor * {
-  cursor: none !important;
-}
 
 .label {
   font-family: var(--font-mono), monospace;
