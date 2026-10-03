@@ -42,7 +42,7 @@ export default function Hero() {
           className="absolute inset-x-0 top-[38%] mx-auto max-w-5xl px-6 text-center md:top-[40%]"
           style={{ opacity: textOpacity, y: textY }}
         >
-          <p className="label mb-6">Software Engineer</p>
+          <p className="label mb-6">Computer Engineer</p>
           <p className="text-balance text-[clamp(1.6rem,4.2vw,3.5rem)] font-medium leading-[1.12] tracking-[-0.02em]">
             Building AI systems, full-stack products, automation and experimental hardware.
           </p>
