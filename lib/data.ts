@@ -82,5 +82,5 @@ export const capabilities = [
 export const links = {
   email: "gsarbeshwor@gmail.com",
   github: "https://github.com/Sarbeshwor",
-  linkedin: "https://www.linkedin.com/in/your-handle",
+  linkedin: "https://www.linkedin.com/in/nogom/",
 };
